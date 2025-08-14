@@ -1,0 +1,8 @@
+[project]
+name = "EchelleDataTools"
+version = "0.1.0"
+dependencies = [
+    "astropy",
+    "numpy",
+    "matplotlib",
+]
