@@ -36,7 +36,7 @@ def plotImageAndHist(frame):
     axes[1].set_ylabel('Frequency')
 
     plt.tight_layout()
-    plt.show(block=False)
+    plt.show()
 
 
 def plotImageAndHistMulti(frames : list):
@@ -72,5 +72,5 @@ def plotImageAndHistMulti(frames : list):
         axes[row ,1].set_ylabel('Frequency')
 
     plt.tight_layout()
-    plt.show(block=False)
+    plt.show()
 

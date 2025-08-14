@@ -6,7 +6,7 @@ import logging as _logging
 import sys as _sys
 
 _logging.basicConfig(
-        level=_logging.DEBUG,
+        level=_logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         stream=_sys.stdout,
         )
