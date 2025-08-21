@@ -10,7 +10,7 @@ import numpy as np
 from EchelleDataTools.Frame import *
 
 
-def plotImageAndHist(frame):
+def plotImageAndHist(frame, savefig=False, fname=None):
     """
     """
     if not isinstance(frame, BaseFrame):
@@ -25,21 +25,30 @@ def plotImageAndHist(frame):
             vmin=frame.data.mean()-frame.data.std(),
             vmax=frame.data.mean()+frame.data.std(),
             )
-    axes[0].set_title(frame.name.title() if isintance(frame.name, str) else "Frame")
+    axes[0].set_title(frame.name.title() if isinstance(frame.name, str) else "Frame")
     
     axes[1].hist(
             frame.data.ravel(),
             bins=np.arange( math.floor(frame.data.min()), math.ceil(frame.data.max())+1 ),
+            log=True,
             )
     axes[1].set_title('Histogram')
     axes[1].set_xlabel('Pixel Value [DN]')
     axes[1].set_ylabel('Frequency')
 
     plt.tight_layout()
-    plt.show()
+    if not savefig:
+        plt.show()
+    else:
+        if not fname:
+            fname=frame.name
+        plt.savefig(
+                fname,
+                format='svg',
+                )
 
 
-def plotImageAndHistMulti(frames : list):
+def plotImageAndHistMulti(frames : list, savefig=False, fname=None):
     """
     """
     if not isinstance(frames, list):
@@ -72,5 +81,13 @@ def plotImageAndHistMulti(frames : list):
         axes[row ,1].set_ylabel('Frequency')
 
     plt.tight_layout()
-    plt.show()
+    if not savefig:
+        plt.show()
+    else:
+        if not fname:
+            fname=frame.name
+        plt.savefig(
+                fname,
+                format='svg',
+                )
 
