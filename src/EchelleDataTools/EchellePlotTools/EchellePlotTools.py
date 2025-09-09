@@ -14,7 +14,7 @@ def plotImageAndHist(frame, savefig=False, fname=None):
     """
     """
     if not isinstance(frame, BaseFrame):
-        raise TypeError(f"Image must be an instance of numpy.ndarray")
+        raise TypeError(f"frame object must inherit EchelleDataTools.Frame.BaseFrame")
 
     fig, axes = plt.subplots(1, 2, figsize=(10,5))
 
@@ -55,7 +55,7 @@ def plotImageAndHistMulti(frames : list, savefig=False, fname=None):
         raise TypeError(f"Frames argument must be of type list.")
 
     if not all( isinstance(f, BaseFrame) for f in frames):
-        raise TypeError(f"Objects in list frames must be instance of EchelleDataTools.Frame.BaseFrame.")
+        raise TypeError(f"Objects in list frames must inherit EchelleDataTools.Frame.BaseFrame.")
 
     numFrame = len(frames)
 
