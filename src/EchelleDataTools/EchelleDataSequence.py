@@ -229,7 +229,7 @@ class EchelleDataSequence:
                 correction = self.superDarkFrame.data - self.superBiasFrame.data
             try:
                 return self._medianCombine(
-                    [f['data'] for f in frames],
+                    [f.data for f in frames],
                     correction=correction,
                     axis=0
                     )
