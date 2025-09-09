@@ -2,6 +2,8 @@
 #
 doc/
 data/
+*.svg
+
 # vim swap files
 *.swp
 
