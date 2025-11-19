@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__all__ = ['EchelleDataSequence', 'EchellePlotTools']
+__all__ = ['EchelleDataSequence', 'EchellePlotTools', 'EchelleStatsTools']
 
 import logging as _logging
 import sys as _sys
@@ -14,4 +14,4 @@ _logging.basicConfig(
 from EchelleDataTools.EchelleDataSequence import EchelleDataSequence
 from EchelleDataTools.EchelleDataSequenceConfiguration import EchelleDataSequenceConfiguration
 from EchelleDataTools.EchellePlotTools import EchellePlotTools
-
+from EchelleDataTools.EchelleStatsTools import EchelleStatsTools
