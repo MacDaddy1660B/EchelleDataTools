@@ -3,6 +3,7 @@
 __all__ = ['plotImageAndHist', 'plotImageAndHistMulti']
 
 
+from astropy.visualization import HistEqStretch, ImageNormalize, hist
 import matplotlib.pyplot as plt
 import math
 import numpy as np
@@ -18,24 +19,37 @@ def plotImageAndHist(frame, savefig=False, fname=None):
 
     fig, axes = plt.subplots(1, 2, figsize=(10,5))
 
+    stretch = HistEqStretch(frame.data)
+    norm = ImageNormalize(frame.data, stretch=stretch)
+
+    binLimit=(lambda x,y: abs(x) if abs(x)>abs(y) else abs(y))(frame.data.max(), frame.data.min())
+    bins=np.arange(
+            -binLimit, 
+            binLimit+1, 
+            (lambda x: x if x >=1 else 1)((2*binLimit)//10)
+            )
+    bins[(bins >= frame.data.max()) & (bins <= frame.data.min())]
+
     axes[0].imshow(
             frame.data,
             origin='lower',
             cmap='gray',
-            vmin=frame.data.mean()-frame.data.std(),
-            vmax=frame.data.mean()+frame.data.std(),
+            norm=norm,
+            interpolation='none',
             )
     axes[0].set_title(frame.name.title() if isinstance(frame.name, str) else "Frame")
     
     axes[1].hist(
             frame.data.ravel(),
-            bins=np.arange( math.floor(frame.data.min()), math.ceil(frame.data.max())+1 ),
-            log=True,
+            bins='sturges',#bins,
+            density=True,
             )
     axes[1].set_title('Histogram')
     axes[1].set_xlabel('Pixel Value [DN]')
-    axes[1].set_ylabel('Frequency')
-
+    axes[1].set_ylabel('Probability Density')
+    axes[1].ticklabel_format(style='sci', axis='y', scilimits=(-3,0))
+    axes[1].set_xlim(-binLimit, binLimit)
+    
     plt.tight_layout()
     if not savefig:
         plt.show()
@@ -59,26 +73,39 @@ def plotImageAndHistMulti(frames : list, savefig=False, fname=None):
 
     numFrame = len(frames)
 
-    fix, axes = plt.subplots(numFrame, 2, figsize=(10,5) )
+    fig, axes = plt.subplots(numFrame, 2, figsize=(10,10) )
 
     for row, f in enumerate(frames):
+        stretch = HistEqStretch(f.data)
+        norm = ImageNormalize(f.data, stretch=stretch)
+
+        binLimit=(lambda x,y: abs(x) if abs(x)>abs(y) else abs(y))(f.data.max(), f.data.min())
+        bins=np.arange(
+                -binLimit, 
+                binLimit+1, 
+                (lambda x: x if x >=1 else 1)((2*binLimit)//10)
+                )
+        bins[(bins >= f.data.max()) & (bins <= f.data.min())]
+    
         axes[row, 0].imshow(
                 f.data,
                 origin='lower',
                 cmap='gray',
-                vmin=f.data.mean()-f.data.std(),
-                vmax=f.data.mean()+f.data.std(),
+                norm=norm,
+                interpolation='none',
                 )
-        axes[row ,0].set_title(f.name.title() if isinstance(f.name, str) else "Frame")
+        axes[row, 0].set_title(f.name.title() if isinstance(f.name, str) else "Frame")
         
-        axes[row ,1].hist(
+        axes[row, 1].hist(
                 f.data.ravel(),
-                bins=np.arange( math.floor(f.data.min()), math.ceil(f.data.max())+1 ),
-                log=True,
+                bins=bins, #np.arange( math.floor(f.data.min()), math.ceil(f.data.max())+1 ),
+                density=True,
                 )
-        axes[row ,1].set_title('Histogram')
-        axes[row ,1].set_xlabel('Pixel Value [DN]')
-        axes[row ,1].set_ylabel('Frequency')
+        axes[row, 1].set_title('Histogram')
+        axes[row, 1].set_xlabel('Pixel Value [DN]')
+        axes[row, 1].set_ylabel('Probability Density')
+        axes[row, 1].ticklabel_format(style='sci', axis='y', scilimits=(-3,0))
+        axes[row, 1].set_xlim(-binLimit, binLimit)
 
     plt.tight_layout()
     if not savefig:
