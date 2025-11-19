@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-from EchelleDataTools import EchelleDataSequence, EchellePlotTools
+import numpy as np
+from scipy import stats
+
+from EchelleDataTools import EchelleDataSequence, EchellePlotTools, EchelleStatsTools
 from EchelleDataTools.Frame import *
+
 
 
 DATAA = '/home/gmac/Documents/Write-ups/Echelle/Echelle-ICC-Commissioning-Report/data/OLD_20250818'
@@ -56,45 +60,81 @@ redFlatDiffExp = SuperFrame(
         name='experiment',
         )
 
-## Plot the super bias differences
-EchellePlotTools.plotImageAndHist(biasDiffControl,
-        savefig=True,
-        fname='superBiasControl.svg',
-        )
-EchellePlotTools.plotImageAndHist(biasDiffExp,
-        savefig=True,
-        fname='superBiasExp.svg',
-        )
-EchellePlotTools.plotImageAndHistMulti(
-        [biasDiffControl,biasDiffExp,],
-        savefig=True,
-        fname='superBiasDiff.svg'
+### Plot the super bias differences
+#EchellePlotTools.plotImageAndHist(biasDiffControl,
+#        savefig=True,
+#        fname='superBiasControl.svg',
+#        )
+#EchellePlotTools.plotImageAndHist(biasDiffExp,
+#        savefig=True,
+#        fname='superBiasExp.svg',
+#        )
+#EchellePlotTools.plotImageAndHistMulti(
+#        [biasDiffControl,biasDiffExp,],
+#        savefig=True,
+#        fname='superBiasDiff.svg'
+#        )
+#
+### Plot the super flat differences
+#EchellePlotTools.plotImageAndHist(blueFlatDiffControl,
+#        savefig=True,
+#        fname='superBlueFlatDiffControl.svg',
+#        )
+#EchellePlotTools.plotImageAndHist(blueFlatDiffExp,
+#        savefig=True,
+#        fname='superBlueFlatDiffExp.svg',
+#        )
+#EchellePlotTools.plotImageAndHistMulti(
+#        [blueFlatDiffControl,blueFlatDiffExp,],
+#        savefig=True,
+#        fname='superBlueFlatDiff.svg'
+#        )
+#EchellePlotTools.plotImageAndHist(redFlatDiffControl,
+#        savefig=True,
+#        fname='superRedFlatDiffControl.svg',
+#        )
+#EchellePlotTools.plotImageAndHist(redFlatDiffExp,
+#        savefig=True,
+#        fname='superRedFlatDiffExp.svg',
+#        )
+#EchellePlotTools.plotImageAndHistMulti(
+#        [redFlatDiffControl,redFlatDiffExp,],
+#        savefig=True,
+#        fname='superRedFlatDiff.svg'
+#        )
+
+rowc = seqa.biasFrames[0].data.shape[0]//2
+colc = seqa.biasFrames[0].data.shape[1]//2
+box = 32
+boxGrid = np.meshgrid(
+        np.arange(rowc-box//2, rowc+box//2),
+        np.arange(colc-box//2, colc+box//2),
+        indexing='ij'
         )
 
-## Plot the super flat differences
-EchellePlotTools.plotImageAndHist(blueFlatDiffControl,
-        savefig=True,
-        fname='superBlueFlatDiffControl.svg',
+print("Single-sample t-tests:")
+tTestCont = EchelleStatsTools.EchelleTtestSingle(
+        np.array( [f.data for f in seqc.biasFrames]), 
+        np.mean( [f.data for f in seqa.biasFrames]),
         )
-EchellePlotTools.plotImageAndHist(blueFlatDiffExp,
-        savefig=True,
-        fname='superBlueFlatDiffExp.svg',
+print(f"Control test: {tTestCont}")
+
+tTestExp = EchelleStatsTools.EchelleTtestSingle(
+        np.array( [f.data for f in seqb.biasFrames]), 
+        np.mean( [f.data for f in seqa.biasFrames]),
         )
-EchellePlotTools.plotImageAndHistMulti(
-        [blueFlatDiffControl,blueFlatDiffExp,],
-        savefig=True,
-        fname='superBlueFlatDiff.svg'
+print(f"Experiment: {tTestExp}")
+
+print("Independent t-tests:")
+tTestIndCont = EchelleStatsTools.EchelleTtestIndep(
+        np.array( [f.data[boxGrid] for f in seqc.biasFrames]),
+        np.array( [f.data[boxGrid] for f in seqa.biasFrames]),
         )
-EchellePlotTools.plotImageAndHist(redFlatDiffControl,
-        savefig=True,
-        fname='superRedFlatDiffControl.svg',
+print(f"Control: {tTestIndCont}")
+tTestIndExp = EchelleStatsTools.EchelleTtestIndep(
+        np.array( [f.data[boxGrid] for f in seqb.biasFrames]),
+        np.array( [f.data[boxGrid] for f in seqa.biasFrames]),
         )
-EchellePlotTools.plotImageAndHist(redFlatDiffExp,
-        savefig=True,
-        fname='superRedFlatDiffExp.svg',
-        )
-EchellePlotTools.plotImageAndHistMulti(
-        [redFlatDiffControl,redFlatDiffExp,],
-        savefig=True,
-        fname='superRedFlatDiff.svg'
-        )
+print(f"Experiment: {tTestIndExp}")
+
+print(f"{stats.levene(seqc.biasFrames[0].data[boxGrid].ravel(),  seqa.biasFrames[0].data[boxGrid].ravel())}")
