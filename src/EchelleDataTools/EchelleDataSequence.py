@@ -50,7 +50,7 @@ class EchelleDataSequence:
 
         if loadBiasFrames:
             try:
-                self._loadFrames( self.echelleDataSequenceConfiguration.biasList, self.biasFrames)
+                self._loadFrames( self.echelleDataSequenceConfiguration.biasList, self.biasFrames, 'Bias')
             except ValueError as e:
                 logger.error(f"Bias list is empty: {e}")
                 raise e
@@ -60,7 +60,7 @@ class EchelleDataSequence:
 
         if loadDarkFrames:
             try:
-                self._loadFrames( self.echelleDataSequenceConfiguration.darkList, self.darkFrames)
+                self._loadFrames( self.echelleDataSequenceConfiguration.darkList, self.darkFrames, 'Dark')
             except ValueError as e:
                 logger.error(f"Dark list is empty: {e}")
                 raise e
@@ -70,7 +70,7 @@ class EchelleDataSequence:
 
         if loadBlueFlatFrames:
             try:
-                self._loadFrames( self.echelleDataSequenceConfiguration.blueFlatList, self.blueFlatFrames)
+                self._loadFrames( self.echelleDataSequenceConfiguration.blueFlatList, self.blueFlatFrames, 'Blue Flat')
             except ValueError as e:
                 logger.error(f"Blue Flat list is empty: {e}")
                 raise e
@@ -80,7 +80,7 @@ class EchelleDataSequence:
             
         if loadRedFlatFrames:
             try:
-                self._loadFrames( self.echelleDataSequenceConfiguration.redFlatList, self.redFlatFrames)
+                self._loadFrames( self.echelleDataSequenceConfiguration.redFlatList, self.redFlatFrames, 'Red Flat')
             except ValueError as e:
                 logger.error(f"Red Flat list is empty: {e}")
                 raise e
@@ -90,7 +90,7 @@ class EchelleDataSequence:
 
         if loadWaveCalFrames:
             try:
-                self._loadFrames( self.echelleDataSequenceConfiguration.waveCalList, self.waveCalFrames)
+                self._loadFrames( self.echelleDataSequenceConfiguration.waveCalList, self.waveCalFrames, 'Wave Cal')
             except ValueError as e:
                 logger.error(f"Wave Cal list is empty: {e}")
                 raise e
@@ -100,7 +100,7 @@ class EchelleDataSequence:
 
         if loadObjectFrames:
             try:
-                self._loadFrames( self.echelleDataSequenceConfiguration.objectList, self.objectFrames)
+                self._loadFrames( self.echelleDataSequenceConfiguration.objectList, self.objectFrames, 'Object')
             except ValueError as e:
                 logger.error(f"Object list is empty: {e}")
                 raise e
@@ -253,7 +253,7 @@ class EchelleDataSequence:
             raise ValueError("kwarg correction must be None or numpy.ndarray")
 
 
-    def _loadFrames(self, fileList, frameList):
+    def _loadFrames(self, fileList, frameList, frameType=None):
         """
         """
 
@@ -265,7 +265,7 @@ class EchelleDataSequence:
             try:
                 with fits.open(file) as hdul:
                     logger.info(f"Loading: {hdul[0].header['IMAGETYP']} filter: {hdul[0].header['FILTER']} frame: {file}")
-                    frameList.append( Frame(data=hdul[0].data, header=hdul[0].header))
+                    frameList.append( Frame(data=hdul[0].data, header=hdul[0].header, name=frameType))
             except Exception as e:
                 logger.error(e)
                 raise e
