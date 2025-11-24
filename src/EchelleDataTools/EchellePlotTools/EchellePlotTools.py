@@ -22,14 +22,6 @@ def plotImageAndHist(frame, savefig=False, fname=None):
     stretch = HistEqStretch(frame.data)
     norm = ImageNormalize(frame.data, stretch=stretch)
 
-    binLimit=(lambda x,y: abs(x) if abs(x)>abs(y) else abs(y))(frame.data.max(), frame.data.min())
-    bins=np.arange(
-            -binLimit, 
-            binLimit+1, 
-            (lambda x: x if x >=1 else 1)((2*binLimit)//10)
-            )
-    bins[(bins >= frame.data.max()) & (bins <= frame.data.min())]
-
     axes[0].imshow(
             frame.data,
             origin='lower',
@@ -41,14 +33,12 @@ def plotImageAndHist(frame, savefig=False, fname=None):
     
     axes[1].hist(
             frame.data.ravel(),
-            bins='sturges',#bins,
-            density=True,
+            bins=np.arange(frame.data.min(), frame.data.max()+1, 1),
+            log=True,
             )
     axes[1].set_title('Histogram')
     axes[1].set_xlabel('Pixel Value [DN]')
-    axes[1].set_ylabel('Probability Density')
-    axes[1].ticklabel_format(style='sci', axis='y', scilimits=(-3,0))
-    axes[1].set_xlim(-binLimit, binLimit)
+    axes[1].set_ylabel('Frequency')
     
     plt.tight_layout()
     if not savefig:
@@ -79,14 +69,6 @@ def plotImageAndHistMulti(frames : list, savefig=False, fname=None):
         stretch = HistEqStretch(f.data)
         norm = ImageNormalize(f.data, stretch=stretch)
 
-        binLimit=(lambda x,y: abs(x) if abs(x)>abs(y) else abs(y))(f.data.max(), f.data.min())
-        bins=np.arange(
-                -binLimit, 
-                binLimit+1, 
-                (lambda x: x if x >=1 else 1)((2*binLimit)//10)
-                )
-        bins[(bins >= f.data.max()) & (bins <= f.data.min())]
-    
         axes[row, 0].imshow(
                 f.data,
                 origin='lower',
@@ -98,14 +80,12 @@ def plotImageAndHistMulti(frames : list, savefig=False, fname=None):
         
         axes[row, 1].hist(
                 f.data.ravel(),
-                bins=bins, #np.arange( math.floor(f.data.min()), math.ceil(f.data.max())+1 ),
-                density=True,
+                bins=np.arange(frame.data.min(), frame.data.max()+1, 1),
+                log=True,
                 )
         axes[row, 1].set_title('Histogram')
         axes[row, 1].set_xlabel('Pixel Value [DN]')
-        axes[row, 1].set_ylabel('Probability Density')
-        axes[row, 1].ticklabel_format(style='sci', axis='y', scilimits=(-3,0))
-        axes[row, 1].set_xlim(-binLimit, binLimit)
+        axes[row, 1].set_ylabel('Frequency')
 
     plt.tight_layout()
     if not savefig:
