@@ -261,11 +261,11 @@ class EchelleDataSequence:
             logger.warning("Configured list is empty. Nothing to do!")
             raise ValueError("Configured objectList is empty. Nothing to do!")
 
-        for file in fileList:
+        for num, file in enumerate(fileList):
             try:
                 with fits.open(file) as hdul:
                     logger.info(f"Loading: {hdul[0].header['IMAGETYP']} filter: {hdul[0].header['FILTER']} frame: {file}")
-                    frameList.append( Frame(data=hdul[0].data, header=hdul[0].header, name=frameType))
+                    frameList.append( Frame(data=hdul[0].data, header=hdul[0].header, name=f"{frameType} {num+1:n}"))
             except Exception as e:
                 logger.error(e)
                 raise e
